@@ -1,11 +1,13 @@
 from car import Car
-EXIT = "Exit"
 
 
 class Board:
     """
-    Add a class description here.
-    Write briefly about the purpose of the class
+    A class of board objects:
+    each board is a list of lists of ints that represents the rows of the board -
+    each empty block represented by 0 and onces a car is added to a coordinate it contains the name of the car.
+    each board also has a list of empty cells and a list of car objects that are on the board at any given time
+    the class also has methods to change and get attributes and receive information about a board instance
     """
 
     def __init__(self):
@@ -17,10 +19,7 @@ class Board:
             row = []
             if i == 3:
                 for j in range(8):
-                    if j != 7:
-                        row.append(0)
-                    else:
-                        row.append(EXIT)
+                    row.append(0)
             else:
                 for j in range(7):
                     row.append(0)
@@ -39,7 +38,10 @@ class Board:
         board_list = self.__board
         print_str = ""
         for i in range(len(board_list)):
-            print_str = print_str + str(board_list[i]) + "\n"
+            print_row = ""
+            for j in range(len((board_list[i]))):
+                print_row = print_row + str(board_list[i][j]) + " "
+            print_str = print_str + print_row + "\n"
         return print_str
 
     def cell_list(self):
@@ -74,7 +76,6 @@ class Board:
                 else:
                     continue
         return result
-
 
     def target_location(self):
         """
@@ -133,27 +134,39 @@ class Board:
         :param movekey: Key of move in car to activate
         :return: True upon success, False otherwise
         """
-       # implement your code and erase the "pass"
+        # implement your code and erase the "pass"
         for car in self.__cars_on_board:
             if car.get_name() == name:
                 car_to_move = car
-            else:
-                return False
-        possible_to_movekey = movekey in car_to_move.possible_moves().keys()
-        move_requirements_empty = car_to_move.movement_requirements(movekey)[0] in self.__empty_cells
-        if possible_to_movekey and move_requirements_empty:
+        possible_to_movekey = movekey in car_to_move.possible_moves()
+        try:
+            move_requirements_empty = car_to_move.movement_requirements(movekey)[0] in self.__empty_cells
+        except:
+            move_requirements_empty = False
+        if not possible_to_movekey:
+            return False
+        if not move_requirements_empty:
+            return False
+        else:
             current_coordinates = car_to_move.car_coordinates()
+            first_coordinate = current_coordinates[0]
+            car_len = len(current_coordinates)
+            if movekey == "u" or movekey == "d":
+                car_orientation = 0
+            else:
+                car_orientation = 1
             for coordinate in current_coordinates:
                 row, col = coordinate
                 self.__board[row][col] = 0
                 self.__empty_cells.append(coordinate)
-            car_to_move.move(movekey)
-            new_coordinates = car_to_move.car_coordinates()
+            self.__cars_on_board.remove(car_to_move)
+            new_car = Car(name, car_len, first_coordinate, car_orientation)
+            self.__cars_on_board.append(new_car)
+            new_car.move(movekey)
+            new_coordinates = new_car.car_coordinates()
             for coordinate in new_coordinates:
                 row, col = coordinate
-                self.__board[row][col] = car_to_move.get_name()
+                self.__board[row][col] = name
                 self.__empty_cells.remove(coordinate)
-            return True
-        return False
-
+        return True
 

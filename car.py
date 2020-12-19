@@ -6,7 +6,12 @@ VERTICAL_CAR_MOVES = {"u": "cause the car to move up", "d": "cause the car to mo
 
 class Car:
     """
-    Add class description here
+    A class of car object, each car has these private attributions:
+    a name - string
+    length - int - how many "blocks" it occupies
+    location - tuple of ints - the first coordinate of the car - meaning the nearest coordinate to (0,0)
+    orientation -  0/1 - 0 if the car is VERTICAL and 1 if the car is HORIZONTAL
+    the class also has methods to change and get attributes and receive information about a car instance
     """
 
     def __init__(self, name, length, location, orientation):
@@ -19,7 +24,6 @@ class Car:
         """
         # Note that this function is required in your Car implementation.
         # However, is not part of the API for general car types.
-        # implement your code and erase the "pass"
         self.__name = name
         self.__length = length
         self.__location = location
@@ -29,7 +33,6 @@ class Car:
         """
         :return: A list of coordinates the car is in
         """
-        # implement your code and erase the "pass"
         car_len = self.__length
         car_row, car_col = self.__location
         car_orient = self.__orientation
@@ -72,7 +75,6 @@ class Car:
         """
         # For example, a car in locations [(1,2),(2,2)] requires [(3,2)] to
         # be empty in order to move down (with a key 'd').
-        # implement your code and erase the "pass"
         car_possible_moves = self.possible_moves()
         car_coordinates = self.car_coordinates()
         first_coordinate = car_coordinates[0]
@@ -89,13 +91,11 @@ class Car:
             else:
                 return [(first_row, first_col - 1)]
 
-
     def move(self, movekey):
         """ 
         :param movekey: A string representing the key of the required move.
         :return: True upon success, False otherwise
         """
-        # implement your code and erase the "pass"
         if movekey in self.possible_moves().keys():
             row, col = self.__location
             if movekey == "u":
@@ -113,5 +113,4 @@ class Car:
         """
         :return: The name of this car.
         """
-        # implement your code and erase the "pass"
         return self.__name
