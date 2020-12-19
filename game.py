@@ -12,7 +12,11 @@ VALID_CAR_MOVEMENTS = ["u", "d", "r", "l"]
 
 class Game:
     """
-    Add class description here
+    A class of objects of "rush hour" game.
+    each game ahs a board that is constantly updating according to a user input
+    and a target status which represent the state of the target coordinate -
+    if it is occupied by a car - the user won and the game stops,
+    else - the game continues.....
     """
 
     def __init__(self, board):
@@ -42,27 +46,8 @@ class Game:
         don't interfere with the API.
         """
         # implement your code here (and then delete the next line - 'pass')
-        valid_input = False
-        while not valid_input:
-            print("the current board is\n")
-            print(self.__board)
-            user_move = input("what's your move?")
-            if user_move == "!":
-                return "stop"
-            elif user_move.count(",") != 1:
-                print("invalid input")
-                break
-            else:
-                user_car_name, user_movekey = user_move.split(",")
-                if user_car_name not in VALID_CAR_NAMES or user_movekey not in VALID_CAR_MOVEMENTS:
-                    print("invalid car name/direction")
-                    break
-                elif not self.__board.move_car(user_car_name, user_movekey):
-                    print("the car cant be moved")
-                    break
-            print("move done")
-            print(self.__board)
-            valid_input = True
+        pass
+
 
     def play(self):
         """
@@ -71,10 +56,30 @@ class Game:
         """
         # implement your code here (and then delete the next line - 'pass')
         while not self.__target_status:
-            if self.__single_turn() == "stop":
-                return
-            else:
-                self.__target_status = self.__board.cell_content(self.__board.target_location())
+            valid_input = False
+            while not valid_input:
+                print("the current board is\n")
+                print(self.__board)
+                user_move = input("what's your move?")
+                if user_move == "!":
+                    print("okay bye....")
+                    self.__target_status = "stop"
+                    break
+                elif user_move.count(",") != 1:
+                    print("invalid input")
+                    break
+                else:
+                    user_car_name, user_movekey = user_move.split(",")
+                    if user_car_name not in VALID_CAR_NAMES or user_movekey not in VALID_CAR_MOVEMENTS:
+                        print("invalid car name/direction")
+                        break
+                    elif not self.__board.move_car(user_car_name, user_movekey):
+                        print("the car cant be moved")
+                        break
+                print("move done")
+                print(self.__board)
+                valid_input = True
+            self.__target_status = self.__board.cell_content(self.__board.target_location())
         print("nice game")  # in case the user wins
         return
 
