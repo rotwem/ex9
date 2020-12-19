@@ -25,9 +25,9 @@ class Board:
                     row.append(0)
             board_list.append(row)
         self.__board = board_list
-        self.__empty_cells = self.cell_list() #list of tuples
-        self.__cells_with_cars = [] # list of tuples
-        self.__cars_on_board = [] # list of Cars
+        self.__empty_cells = self.cell_list()  # list of tuples
+        self.__cells_with_cars = []  # list of tuples
+        self.__cars_on_board = []  # list of Cars
 
     def __str__(self):
         """
@@ -67,9 +67,29 @@ class Board:
         # [('O','d',"some description"),('R','r',"some description"),('O','u',"some description")]
         result = []
         for car in self.__cars_on_board:
-            moves = car.possible_moves()
-            for direction, description in moves.items():
-                result.append([car.get_name(), direction, description])
+            orientation = car.orientation
+            if orientation == 0:
+                move1 = "u"
+                move2 = "d"
+                if car.movement_requirements(move1) in self.__empty_cells:
+                    result.append((car.get_name(), "u", "cause the car to move up"))
+                else:
+                    continue
+                if car.movement_requirements(move2) in self.__empty_cells:
+                    result.append((car.get_name(), "d", "cause the car to move down"))
+                else:
+                    continue
+            else:
+                move1 = "r"
+                move2 = "l"
+                if car.movement_requirements(move1) in self.__empty_cells:
+                    result.append((car.get_name(), "r", "cause the car to move right"))
+                else:
+                    continue
+                if car.movement_requirements(move2) in self.__empty_cells:
+                    result.append((car.get_name(), "l", "cause the car to move left"))
+                else:
+                    continue
         return result
 
     def target_location(self):
@@ -104,25 +124,24 @@ class Board:
         # Remember to consider all the reasons adding a car can fail.
         # You may assume the car is a legal car object following the API.
         # implement your code and erase the "pass"
-        if car in self.__cars_on_board:
-            return False
+        for any_car in self.__cars_on_board:
+            if car.get_name() == any_car.get_name():
+                return False
+            else:
+                continue
         coordinates = car.car_coordinates()
         for coordinate in coordinates:
             if coordinate in self.__cells_with_cars:
+                return False
+            elif coordinate not in self.cell_list():
                 return False
             else:
                 row, col = coordinate
                 self.__board[row][col] = car.get_name()
                 self.__cells_with_cars.append(coordinate)
+                self.__empty_cells.remove(coordinate)
         self.__cars_on_board.append(car)
         return True
-
-    def remove_car_from_board(self, car):
-        self.__cars_on_board.remove(car)
-        car_coordinates = car.car_coordinates()
-        for coordinate in car_coordinates:
-            row, col = coordinate
-            self.__board[row][col] = 0
 
     def move_car(self, name, movekey):
         """
@@ -137,12 +156,21 @@ class Board:
                 car_to_move = car
             else:
                 return False
-        move_requirements = car_to_move.movement_requirements(movekey)
-        if move_requirements[0] in self.__empty_cells:
-            self.remove_car_from_board(car_to_move)
+        possible_to_movekey = movekey in car_to_move.possible_moves().keys()
+        move_requirements_empty = car_to_move.movement_requirements(movekey) in self.__empty_cells
+        if possible_to_movekey and move_requirements_empty:
+            current_coordinates = car_to_move.car_coordinates()
+            for coordinate in current_coordinates:
+                row, col = coordinate
+                self.__board[row][col] = 0
+                self.__empty_cells.append(coordinate)
+                self.__cells_with_cars.remove(coordinate)
             car_to_move.move(movekey)
-            self.add_car(car_to_move)
+            new_coordinates = car_to_move.car_coordinates()
+            for coordinate in new_coordinates:
+                row, col = coordinate
+                self.__board[row][col] = car_to_move.get_name()
+                self.__empty_cells.remove(coordinate)
+                self.__cells_with_cars.append(coordinate)
             return True
-        else:
-            return False
-
+        return False
